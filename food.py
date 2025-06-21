@@ -1,10 +1,3 @@
-# FoodDeliveryPlatform
-#  - add_driver
-#  - record_delivery
-#  - get_total_earnings
-#  - get_top_driver
-
-
 class FoodDeliveryPlatform:
     def __init__(self):
         self.driverRateMap = {}

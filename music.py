@@ -1,11 +1,3 @@
-# design music library:
-#     play song
-#     get top k songs
-
-
-# song map (track songs and how many times were they played)
-# user to song map (which user played what song) value should be a deque if we want to track latest 
-
 from collections import deque
 import heapq
 class MusicLib:

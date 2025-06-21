@@ -1,6 +1,3 @@
-# ---- users # ---- user tweets
-# ---- follower and following
-# ---- recent tweets  -- timestamp
 import heapq
 class Tweeter:
     def __init__(self):

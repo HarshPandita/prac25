@@ -1,11 +1,3 @@
-
-# get
-# set
-# delete
-# begin
-# commit
-# rollback
-
 class KvPair:
     def __init__(self):
         self.transactions = []
