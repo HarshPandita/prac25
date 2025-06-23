@@ -4,9 +4,10 @@ class MusicPlayer:
     def __init__(self):
         self.songIdCounter = 1
         self.songIdToTitle = {}                         # songId → title
-        self.songIdToUserSet = defaultdict(set)         # songId → set(userIds)
-        self.userToRecentSongs = defaultdict(deque)     # userId → deque (unique recent songs)
-
+        self.songIdToUserSet = defaultdict(set)         # songId → set(userIds) O(1)
+        self.userToRecentSongs = defaultdict(deque)     # userId → deque (unique recent songs)  
+                                                        # removing a song id -  O(3) as only 3 top required
+                                                        # insert O(1) for pop and add
     def addSong(self, songTitle):
         songId = self.songIdCounter
         self.songIdCounter += 1
@@ -32,7 +33,7 @@ class MusicPlayer:
     def printMostPlayedSongs(self):
         # Build a list of (songId, uniqueUserCount)
         songList = [(songId, len(users)) for songId, users in self.songIdToUserSet.items()]
-        songList.sort(key=lambda x: (-x[1], self.songIdToTitle[x[0]]))  # Sort by user count desc, then title
+        songList.sort(key=lambda x: (-x[1], self.songIdToTitle[x[0]]))  # O(S log S)
         
         for songId, count in songList:
             print(f"{self.songIdToTitle[songId]} ({count} unique plays)")

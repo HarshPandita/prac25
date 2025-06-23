@@ -48,7 +48,7 @@ for i in range(7):
 # 
         
 import time
-
+# o(1)
 class TokenBucket:
     def __init__(self, capacity, refill_rate_per_sec):
         self.capacity = capacity                      # Max tokens that can be held
