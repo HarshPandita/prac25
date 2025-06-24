@@ -8,7 +8,7 @@ class Node:
     def __repr__(self):
         return f"{self.type}: {self.name}"
 
-
+# O(E*H)
 def build_hierarchy():
     # Sample tree
     company = Node("Company", "Company")

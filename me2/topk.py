@@ -1,6 +1,6 @@
 from collections import Counter
 import heapq
-# o(nlogk)
+#tc: o(nlogk)
 def topKFrequent(nums, k):
     # Step 1: Count frequencies
     freq_map = Counter(nums)

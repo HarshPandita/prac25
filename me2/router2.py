@@ -7,7 +7,7 @@ class FileSystem:
     def __init__(self):
         self.root = TrieNode()
 
-    def put(self, path, value):
+    def put(self, path, value): #(On)
         # Split and remove empty parts (to handle "//" and leading/trailing slashes)
         parts = [part for part in path.split("/") if part]
         node = self.root

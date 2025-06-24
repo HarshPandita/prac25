@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-# O(n)
+#tc: O(n)
 def topKFrequent(nums, k):
     freq_map = defaultdict(int)
 
