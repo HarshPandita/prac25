@@ -3,20 +3,19 @@ class KvPair:
         self.transactions = []
         self.realMap = {}
 
-    def get(self, k):
+    def get(self, k): #O(txnstack length)
         for txn in reversed(self.transactions):
-            if k not in txn:
-                return "None"
-            return txn[k]
+            if k in txn:
+                return txn[k]
 
         return self.realMap[k] if k in self.realMap else "None"
     
-    def set(self, k, v):
+    def set(self, k, v): #O(1)
         if  self.transactions:
             self.transactions[-1][k] = v
         else:
             self.realMap[k] = v
-    def delete(self, k):
+    def delete(self, k): #O(1)
         if  self.transactions:
             self.transactions[-1][k] = "NULL"
         else:
@@ -26,14 +25,29 @@ class KvPair:
     def begin(self):
         self.transactions.append({})
 
-    def commit(self):
-        for k,v in self.transactions[-1].items():
-            self.realMap[k] = v
+    # def commit(self):
+    #     for k,v in self.transactions[-1].items():
+    #         self.realMap[k] = v
 
-        self.transactions = []
-        return "committed"
+    #     self.transactions = []
+    #     return "committed"
     
-    def rollback(self):
+    # Time: O(K)
+    # (where K = number of keys in top transaction)
+    def commit(self):
+        if not self.transactions:
+            return "NO TRANSACTION"
+
+        top = self.transactions.pop()
+
+        if self.transactions:
+            self.transactions[-1].update(top)
+        else:
+            self.realMap.update(top)
+
+        return "COMMITTED"
+    
+    def rollback(self): #O(1)
         if len(self.transactions)!=0:
             return(self.transactions.pop())
         else:
@@ -53,6 +67,8 @@ print("Test 2: Simple transaction + rollback")
 kv.set("x", "1")
 kv.begin()
 kv.set("x", "2")
+kv.set("y", "2")
+kv.begin()
 print(kv.get("x") == "2")
 kv.rollback()
 print(kv.get("x") == "1")
@@ -62,9 +78,9 @@ kv.begin()
 kv.set("x", "3")
 kv.begin()
 kv.set("x", "4")
-print(kv.get("x") == "4")
+print(kv.get("x"))
 kv.commit()
-print(kv.get("x") == "4")
+print(kv.get("x"))
 
 print("Test 4: Rollback after commit (should fail)")
 result = kv.rollback()
@@ -77,3 +93,5 @@ kv.delete("z")
 print(kv.get("z") == "NULL")
 kv.rollback()
 print(kv.get("z") == "100")
+kv.commit()
+print(kv.get("z"))

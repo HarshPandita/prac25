@@ -1,13 +1,13 @@
 from collections import defaultdict, deque
 
-def build_graph(rates):
+def build_graph(rates): #O(E)
     graph = defaultdict(list)
     for src, dst, rate in rates:
         graph[src].append((dst, rate))
         graph[dst].append((src, 1 / rate))  # assume reversibility
     return graph
 
-def find_conversion_rate(rates, query):
+def find_conversion_rate(rates, query): #O(v+e)
     graph = build_graph(rates)
     src, dst = query
 

@@ -1,55 +1,3 @@
-class CatRule:
-    def __init__(self, allowed_catargories):
-        self.allowed_cats = allowed_catargories
-
-    def apply(self, expense):
-        if expense["category"] not in  self.allowed_cats:
-            return({"bad":True,"desc":f'{expense["category"]} - is not an allowed cataegory'})
-        else:
-            return({"bad":False})
-
-class ExpRule:
-    def __init__(self, limits):
-        self.limits = limits
-
-    def apply(self, expense):
-        if expense["category"] in self.limits and expense["amount"] > self.limits[expense["category"]]:
-            return({"bad":True,"desc":f'{expense["amount"]} - is greater then the limit of {expense["category"]}'})
-        
-        else:
-            return({"bad":False})
-
-
-class RulesEngine:
-    def __init__(self, rules):
-        self.rules = rules
-        
-    def validate_expenses(self, expenses):
-        errors = []
-        for exp in expenses:
-            for rule in self.rules:
-                if rule.apply(exp)["bad"]:
-                    errors.append(rule.apply(exp)["desc"])
-
-        print(errors)
-    
-
-rules = [
-    CatRule(["Travel", "Food", "Lodging"]),
-    ExpRule({"Travel": 300, "Food": 100})
-]
-
-engine = RulesEngine(rules)
-
-expenses = [
-    {"employee_id": "E001", "date": "2025-06-06", "category": "123", "amount": 350, "description": "Flight"},
-    {"employee_id": "E002", "date": "2025-06-01", "category": "Food", "amount": 888, "description": "Dinner"}
-    ]
-
-engine.validate_expenses(expenses)
-
-
-# 
 class ExpenseTypeRule:
     def __init__(self, rule_map):
         self.rule_map = rule_map  # e.g., {"seller": 100, "vendor": 200}
@@ -77,36 +25,68 @@ class AllowedExpenseType:
         if expense["type"] not in self.allowed_types:
             return f"'{expense['type']}' type should not be charged"
 
+class WeekdayRule:
+    def __init__(self, allowed_days):
+        """
+        allowed_days: list of int (0=Monday, 6=Sunday)
+        """
+        self.allowed_days = allowed_days
+
+    def apply(self, expense):
+        date_str = expense.get("date")
+        if not date_str:
+            return "Expense must include a 'date' field"
+
+        try:
+            date_obj = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+        except ValueError:
+            return f"Invalid date format for expense: {date_str} (expected YYYY-MM-DD)"
+
+        weekday = date_obj.weekday()
+        if weekday not in self.allowed_days:
+            weekday_name = date_obj.strftime("%A")
+            return f"Expenses not allowed on {weekday_name}s"
+
+
 
 class RuleEngine:
     def __init__(self, rule_list):
         self.rule_list = rule_list
 
     def apply(self, expense_list):
-        errors = []
+        results = []
+        
         for expense in expense_list:
+            errors = []
             for rule in self.rule_list:
                 err = rule.apply(expense)
                 if err:
                     errors.append(err)
-        return errors if errors else "All txns approved"
+            if errors:
+                results.append({
+                    "expense": expense,
+                    "errors": errors
+                })
+            
+        return results if results else "All txns approved"
 
 
 # === Instantiate rules ===
 rule1 = AllowedExpenseType(["seller", "vendor"])
 rule2 = TotalExpense(250)
 rule3 = ExpenseTypeRule({"seller": 100, "vendor": 200})
+weekday_rule = WeekdayRule([0, 1, 2, 3, 4])
 
-engine = RuleEngine([rule1, rule2, rule3])
+
+engine = RuleEngine([rule1, rule2, rule3,weekday_rule])
 
 # === Sample input ===
 expenses = [
-    {"type": "seller", "amount": 50},       # OK
-    {"type": "vendor", "amount": 300},      # Total > 250 and vendor limit = 200
-    {"type": "contractor", "amount": 100},  # Not allowed type
-    {"type": "seller", "amount": 120},      # Seller exceeds type limit
+    {"type": "seller", "amount": 50, "date": "2025-06-23"},      # Monday - OK
+    {"type": "vendor", "amount": 300, "date": "2025-06-22"},     # Sunday - disallowed
+    {"type": "contractor", "amount": 100, "date": "2025-06-21"}, # Saturday - disallowed + type not allowed
+    {"type": "seller", "amount": 120, "date": "2025-06-25"},     # Wednesday - OK but seller > 100
 ]
-
 # === Run engine ===
 result = engine.apply(expenses)
 print(result)

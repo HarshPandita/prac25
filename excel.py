@@ -4,8 +4,11 @@ class Excel:
 
     def set(self, cell, value):
         self.cells[cell] = value
-
-    def get_value(self, cell, visited=None):
+        
+    # N = number of total cells
+    # L = average length of formula expressions (number of tokens)
+    # D = depth of formula dependency (how many layers of indirection)
+    def get_value(self, cell, visited=None): # o(l*d) - 
         if visited is None:
             visited = set()
         if cell in visited:
@@ -34,7 +37,7 @@ class Excel:
 
         return total
 
-    def print(self):
+    def print(self): #O(N*L*D)
         for cell in sorted(self.cells):
             raw = self.cells[cell]
             computed = self.get_value(cell)

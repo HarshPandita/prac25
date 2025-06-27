@@ -7,19 +7,19 @@ class Splitwise:
         self.debt_queue = deque()
         self.credit_queue = deque()
 
-    def _calculate_balances(self):
+    def _calculate_balances(self): #O(n)
         for frm, to, amt in self.transactions:
             self.balance[frm] -= amt
             self.balance[to] += amt
 
-    def _create_queues(self):
+    def _create_queues(self): #O(p)
         for person, val in self.balance.items():
             if val < 0:
                 self.debt_queue.append((person, -val))
             elif val > 0:
                 self.credit_queue.append((person, val))
 
-    def _settle_balances(self):
+    def _settle_balances(self): #O(p)
         result = []
         while self.debt_queue and self.credit_queue:
             debtor, debt_amt = self.debt_queue.popleft()
