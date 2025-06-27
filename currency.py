@@ -28,3 +28,12 @@ def find_conversion_rate(rates, query): #O(v+e)
                 queue.append((neighbor, product * rate))
 
     return -1  # path not found
+
+rates = [
+    ("USD", "EUR", 0.85),
+    ("EUR", "JPY", 130),
+    ("GBP", "USD", 1.39),
+]
+
+rates = [("USD", "EUR", 0.85)]
+print(find_conversion_rate(rates, ("USD", "EUR")))
