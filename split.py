@@ -12,14 +12,14 @@ class Splitwise:
             self.balance[frm] -= amt
             self.balance[to] += amt
 
-    def _create_queues(self): #O(p)
+    def _create_queues(self): #O(p)  - p = no. of ppl
         for person, val in self.balance.items():
             if val < 0:
                 self.debt_queue.append((person, -val))
             elif val > 0:
                 self.credit_queue.append((person, val))
 
-    def _settle_balances(self): #O(p)
+    def _settle_balances(self): #O(p)  - p = no. of ppl
         result = []
         while self.debt_queue and self.credit_queue:
             debtor, debt_amt = self.debt_queue.popleft()
