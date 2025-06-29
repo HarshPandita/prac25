@@ -31,6 +31,7 @@ class Tweeter:
                 heapq.heappush(maxHeap, (-timestamp, tweetId, followeeId, index))
 
         result = []
+        # o(10logf)
         while maxHeap and len(result) < 10:
             negTs, tweetId, uid, idx = heapq.heappop(maxHeap)
             result.append(tweetId)
