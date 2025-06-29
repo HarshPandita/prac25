@@ -1,7 +1,6 @@
 class ExpenseTypeRule:
     def __init__(self, rule_map):
         self.rule_map = rule_map  # e.g., {"seller": 100, "vendor": 200}
-
     def apply(self, expense):
         exp_type = expense["type"]
         if exp_type in self.rule_map and expense["amount"] > self.rule_map[exp_type]:
@@ -10,31 +9,24 @@ class ExpenseTypeRule:
 class TotalExpense:
     def __init__(self, limit):
         self.limit = limit
-
     def apply(self, expense):
         if expense["amount"] > self.limit:
             return f"Total expense should not be > {self.limit}"
 
 class AllowedExpenseType:
     def __init__(self, allowed_types):
-        self.allowed_types = allowed_types
-
+        self.allowed_types = set(allowed_types) #o(1) lookup for sets
     def apply(self, expense):
         if expense["type"] not in self.allowed_types:
             return f"'{expense['type']}' type should not be charged"
 
 class WeekdayRule:
     def __init__(self, allowed_days):
-        """
-        allowed_days: list of int (0=Monday, 6=Sunday)
-        """
         self.allowed_days = allowed_days
-
     def apply(self, expense):
         date_str = expense.get("date")
         if not date_str:
             return "Expense must include a 'date' field"
-
         try:
             date_obj = datetime.datetime.strptime(date_str, "%Y-%m-%d")
         except ValueError:
@@ -45,12 +37,10 @@ class WeekdayRule:
             weekday_name = date_obj.strftime("%A")
             return f"Expenses not allowed on {weekday_name}s"
 
-
-
 class RuleEngine:
     def __init__(self, rule_list):
         self.rule_list = rule_list
-
+    # 	O(E × R) -  e = no. of expenses and r = no. of rules
     def apply(self, expense_list):
         results = []
         

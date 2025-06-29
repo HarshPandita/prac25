@@ -3,13 +3,11 @@ class KvPair:
         self.transactions = []
         self.realMap = {}
 
-    def get(self, k): #O(txnstack length)
+    def get(self, k): #O(txn stack length)
         for txn in reversed(self.transactions):
             if k in txn:
                 return txn[k]
-
         return self.realMap[k] if k in self.realMap else "None"
-    
     def set(self, k, v): #O(1)
         if  self.transactions:
             self.transactions[-1][k] = v
@@ -20,11 +18,22 @@ class KvPair:
             self.transactions[-1][k] = "NULL"
         else:
             self.realMap[k] = "NULL"
-
-    
     def begin(self):
         self.transactions.append({})
-
+    def commit(self):
+        if not self.transactions:
+            return "NO TRANSACTION"
+        top = self.transactions.pop()
+        if self.transactions:
+            self.transactions[-1].update(top)
+        else:
+            self.realMap.update(top)
+        return "COMMITTED"
+    def rollback(self): #O(1)
+        if len(self.transactions)!=0:
+            return(self.transactions.pop())
+        else:
+            "NO TRANSACTION"
     # def commit(self):
     #     for k,v in self.transactions[-1].items():
     #         self.realMap[k] = v
@@ -34,24 +43,7 @@ class KvPair:
     
     # Time: O(K)
     # (where K = number of keys in top transaction)
-    def commit(self):
-        if not self.transactions:
-            return "NO TRANSACTION"
-
-        top = self.transactions.pop()
-
-        if self.transactions:
-            self.transactions[-1].update(top)
-        else:
-            self.realMap.update(top)
-
-        return "COMMITTED"
     
-    def rollback(self): #O(1)
-        if len(self.transactions)!=0:
-            return(self.transactions.pop())
-        else:
-            "NO TRANSACTION"
         
 
 kv = KvPair()

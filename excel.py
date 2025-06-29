@@ -36,9 +36,22 @@ class Excel:
                 total += val
 
         return total
-
+    def reset(self, cell):
+        self.cells.pop(cell, None)
     def print(self): #O(N*L*D)
         for cell in sorted(self.cells):
             raw = self.cells[cell]
             computed = self.get_value(cell)
             print(f"{cell}: raw = {raw}, computed = {computed}")
+
+
+
+xl = Excel()
+xl.set("A1", "5")
+xl.set("B1", "3")
+xl.set("C1", "=A1+B1+2")
+xl.print()
+
+print("After resetting A1:")
+xl.reset("A1")
+xl.print()
