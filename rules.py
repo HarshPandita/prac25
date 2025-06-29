@@ -7,7 +7,6 @@ class ExpenseTypeRule:
         if exp_type in self.rule_map and expense["amount"] > self.rule_map[exp_type]:
             return f"Seller type '{exp_type}' should not have expense more than {self.rule_map[exp_type]}"
 
-
 class TotalExpense:
     def __init__(self, limit):
         self.limit = limit
@@ -15,7 +14,6 @@ class TotalExpense:
     def apply(self, expense):
         if expense["amount"] > self.limit:
             return f"Total expense should not be > {self.limit}"
-
 
 class AllowedExpenseType:
     def __init__(self, allowed_types):

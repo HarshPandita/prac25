@@ -1,71 +1,85 @@
 import heapq
+from collections import defaultdict
+
 class Tweeter:
     def __init__(self):
         self.timestamp = 0
-        self.userTweets = {}
-        self.userFollowers = {}
+        self.userTweets = defaultdict(list)  # userId → list of (timestamp, tweetId)
+        self.userFollowers = defaultdict(set)
 
-    
-    def postTweet(self, userId, tweetId, tweetDesc = None):
-        
-        if userId not in self.userTweets:
-            self.userTweets[userId] = []
+    def postTweet(self, userId, tweetId, tweetDesc=None):
         self.userTweets[userId].append((self.timestamp, tweetId))
-        
         self.timestamp += 1
 
     def follow(self, userId, followeeId):
-        if userId not in self.userFollowers:
-            self.userFollowers[userId] = set()
         self.userFollowers[userId].add(followeeId)
 
     def unfollow(self, userId, followeeId):
-        if userId not in self.userFollowers:
-            print("No such user")
-        self.userFollowers[userId].remove(followeeId)
+        self.userFollowers[userId].discard(followeeId)
 
-    
     def getNewsFeed(self, userId):
-        if userId not in self.userFollowers:
-            self.userFollowers[userId]=set()
-        self.userFollowers[userId].add(userId)
+        self.userFollowers[userId].add(userId)  # Ensure self-follow
 
-        allFollowers = self.userFollowers[userId]
-        heap = []
-        for follower in allFollowers:
+        maxHeap = []
+        # O(no. of followers)
+        for followeeId in self.userFollowers[userId]:
+            tweets = self.userTweets.get(followeeId, [])
+            if tweets:
+                index = len(tweets) - 1  # Start from latest tweet
+                timestamp, tweetId = tweets[index]
+                # Push: (-timestamp, tweetId, followeeId, index)
+                heapq.heappush(maxHeap, (-timestamp, tweetId, followeeId, index))
+
+        result = []
+        while maxHeap and len(result) < 10:
+            negTs, tweetId, uid, idx = heapq.heappop(maxHeap)
+            result.append(tweetId)
+            if idx > 0:
+                # Push the next most recent tweet of this user
+                nextTs, nextTweetId = self.userTweets[uid][idx - 1]
+                heapq.heappush(maxHeap, (-nextTs, nextTweetId, uid, idx - 1))
+
+        return result
+
+    # def getNewsFeed(self, userId):
+    #     if userId not in self.userFollowers:
+    #         self.userFollowers[userId]=set()
+    #     self.userFollowers[userId].add(userId)
+
+    #     allFollowers = self.userFollowers[userId]
+    #     heap = []
+    #     for follower in allFollowers:
             
-            posts = self.userTweets[follower]
-            for post in posts[-10:]:
-                heapq.heappush(heap, (post[0],post[1]))
-                if len(heap)>10:
-                    heapq.heapop(heap)
+    #         posts = self.userTweets[follower]
+    #         for post in posts[-10:]:
+    #             heapq.heappush(heap, (post[0],post[1]))
+    #             if len(heap)>10:
+    #                 heapq.heappop(heap)
             
-        return [tweetId for _, tweetId in sorted(heap, reverse=True)]
+    #     return [tweetId for _, tweetId in sorted(heap, reverse=True)]
+
+# twitter = Tweeter()
+# twitter.postTweet(1, 5)
+# print(twitter.getNewsFeed(1))  # ➞ [5]
+
+# twitter.postTweet(2, 6)
+# twitter.follow(1, 2)
+# print(twitter.getNewsFeed(1))  # ➞ [6, 5] (6 is newer than 5)
 
 
+# twitter.unfollow(1, 2)
+# print(twitter.getNewsFeed(1))  # ➞ [5] (user 1 no longer sees user 2's tweet)
 
-twitter = Tweeter()
-twitter.postTweet(1, 5)
-print(twitter.getNewsFeed(1))  # ➞ [5]
-
-twitter.postTweet(2, 6)
-twitter.follow(1, 2)
-print(twitter.getNewsFeed(1))  # ➞ [6, 5] (6 is newer than 5)
-
-
-twitter.unfollow(1, 2)
-print(twitter.getNewsFeed(1))  # ➞ [5] (user 1 no longer sees user 2's tweet)
-
-for i in range(10):
-    twitter.postTweet(1, 100 + i)
-print(twitter.getNewsFeed(1))  # ➞ [109, 108, ..., 100]
+# for i in range(10):
+#     twitter.postTweet(1, 100 + i)
+# print(twitter.getNewsFeed(1))  # ➞ [109, 108, ..., 100]
 
 
 
 twitter = Tweeter()
 twitter.postTweet(1, 10)
-twitter.postTweet(2, 20)
 twitter.postTweet(3, 30)
+twitter.postTweet(2, 20)
 twitter.postTweet(2, 21)
 twitter.follow(1, 2)
 twitter.follow(1, 3)
