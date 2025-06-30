@@ -1,3 +1,10 @@
+import datetime
+#  feed the whole expense list to each rule
+# eg: food expense < total trip expense < 50 dollars
+# eg; food 
+#         - vendor1 max expense
+#         - vendor2 max expense
+
 class ExpenseTypeRule:
     def __init__(self, rule_map):
         self.rule_map = rule_map  # e.g., {"seller": 100, "vendor": 200}

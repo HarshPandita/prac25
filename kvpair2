@@ -1,0 +1,61 @@
+class KeyValueStore:
+    def __init__(self):
+        self.cache = {}  # Main committed store
+        self.transactions = []  # Stack of transaction layers
+
+    def _current_layer(self):
+        if self.transactions:
+            return self.transactions[-1]
+        return None
+
+    def get(self, key):
+        # Traverse from topmost transaction down to base cache
+        for layer in reversed(self.transactions):
+            if key in layer['deleted']:
+                return None
+            if key in layer['data']:
+                return layer['data'][key]
+        if key in self.cache:
+            return self.cache[key]
+        return None
+
+    def set(self, key, value):
+        layer = self._current_layer()
+        if layer:
+            layer['data'][key] = value
+            layer['deleted'].discard(key)
+        else:
+            self.cache[key] = value
+
+    def delete(self, key):
+        layer = self._current_layer()
+        if layer:
+            layer['deleted'].add(key)
+            layer['data'].pop(key, None)
+        else:
+            self.cache.pop(key, None)
+
+    def begin(self):
+        # Each layer contains its own key-value updates and keys marked for deletion
+        self.transactions.append({'data': {}, 'deleted': set()})
+
+    def commit(self):
+        if not self.transactions:
+            raise Exception("No transaction to commit")
+
+        current = self.transactions.pop()
+        if self.transactions:
+            parent = self._current_layer()
+            # Apply current transaction changes to the parent
+            parent['data'].update(current['data'])
+            parent['deleted'].update(current['deleted'])
+        else:
+            # Commit to base cache
+            for key in current['deleted']:
+                self.cache.pop(key, None)
+            self.cache.update(current['data'])
+
+    def rollback(self):
+        if not self.transactions:
+            raise Exception("No transaction to rollback")
+        self.transactions.pop()

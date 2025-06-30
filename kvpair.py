@@ -25,9 +25,9 @@ class KvPair:
             return "NO TRANSACTION"
         top = self.transactions.pop()
         if self.transactions:
-            self.transactions[-1].update(top)
+            self.transactions[-1].update(top) #O(len(top))
         else:
-            self.realMap.update(top)
+            self.realMap.update(top) #O(len(top))
         return "COMMITTED"
     def rollback(self): #O(1)
         if len(self.transactions)!=0:
