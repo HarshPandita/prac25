@@ -9,7 +9,6 @@ class KeyValueStore:
         return None
 
     def get(self, key):
-        # Traverse from topmost transaction down to base cache
         for layer in reversed(self.transactions):
             if key in layer['deleted']:
                 return None
@@ -36,25 +35,20 @@ class KeyValueStore:
             self.cache.pop(key, None)
 
     def begin(self):
-        # Each layer contains its own key-value updates and keys marked for deletion
         self.transactions.append({'data': {}, 'deleted': set()})
 
     def commit(self):
         if not self.transactions:
             raise Exception("No transaction to commit")
-
         current = self.transactions.pop()
         if self.transactions:
             parent = self._current_layer()
-            # Apply current transaction changes to the parent
             parent['data'].update(current['data'])
             parent['deleted'].update(current['deleted'])
         else:
-            # Commit to base cache
             for key in current['deleted']:
                 self.cache.pop(key, None)
             self.cache.update(current['data'])
-
     def rollback(self):
         if not self.transactions:
             raise Exception("No transaction to rollback")
