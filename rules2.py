@@ -157,27 +157,26 @@ class RuleEngine:
             {"trip_id": tid, "errors": errs}
             for tid, errs in error_map.items()
         ]
+def evaluate_rules(rules, expenses):
+    engine = RuleEngine(rules)
+    return engine.apply(expenses)
 
+from pprint import pprint
 
-# === Example Usage ===
-if __name__ == "__main__":
-    expenses = [
+rules = [
+    AndRule(
+        AllowedExpenseType(["seller", "vendor", "food"]),
+        ExpenseTypeRule({"seller": 100, "vendor": 200, "food": 100})
+        # TotalExpense(500),
+        # WeekdayRule([0, 1, 2, 3, 4]),
+        # ConditionalTypeCapRule(400, {"food": 50})
+    )
+]
+expenses = [
         {"trip_id": "T1", "type": "seller", "amount": 50, "date": "2025-06-23"},
         {"trip_id": "T1", "type": "vendor", "amount": 300, "date": "2025-06-22"},
         {"trip_id": "T2", "type": "contractor", "amount": 100, "date": "2025-06-21"},
         {"trip_id": "T1", "type": "seller", "amount": 120, "date": "2025-06-25"},
         {"trip_id": "T1", "type": "food", "amount": 60, "date": "2025-06-25"},
     ]
-
-    engine = RuleEngine([
-        AndRule(
-            AllowedExpenseType(["seller", "vendor", "food"])
-            ,ExpenseTypeRule({"seller": 100, "vendor": 200, "food": 100})
-            # ,TotalExpense(500),
-            # WeekdayRule([0, 1, 2, 3, 4])
-            # ,ConditionalTypeCapRule(400, {"food": 50})  # If trip total > 400, food max is 50
-        )
-    ])
-
-    from pprint import pprint
-    pprint(engine.apply(expenses))
+pprint(evaluate_rules(rules, expenses))
