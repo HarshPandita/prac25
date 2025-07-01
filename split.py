@@ -38,3 +38,4 @@ class Splitwise:
         self._calculate_balances()
         self._create_queues()
         return self._settle_balances()
+txns = [("A", "B", 10), ("B", "C", 5)]
