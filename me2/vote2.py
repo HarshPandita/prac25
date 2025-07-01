@@ -1,3 +1,6 @@
+
+# O(n+clogc)
+
 def getResults(ballots):
     from collections import defaultdict
 

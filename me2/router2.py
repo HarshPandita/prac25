@@ -2,7 +2,8 @@ class TrieNode:
     def __init__(self):
         self.val = -1
         self.children = {}
-
+#ok^w  k=branching factor and w = no. if wildcards
+#O(d)   d=no of parts
 class FileSystem:
     def __init__(self):
         self.root = TrieNode()

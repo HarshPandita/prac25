@@ -1,11 +1,11 @@
 import heapq
-
+#o(nlogkn
 def assign_courts(intervals):
     # Sort intervals by start time
     intervals.sort(key=lambda x: x[0]) #o(nlog(n))
 
     # List of (end_time, court_id)
-    court_heap = [] #o(logk)
+    court_heap = [] 
     court_assignments = {}
     court_id_counter = 1
 

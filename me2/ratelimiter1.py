@@ -11,7 +11,6 @@ class UserBucket:
         self.refill_interval = refill_interval
         self.last_refill_time = time.time()
         # self.lock = threading.Lock()  # 🔐 Add a lock per user
-
     def refill(self):
         current_time = time.time()
         elapsed = current_time - self.last_refill_time
@@ -21,11 +20,9 @@ class UserBucket:
             self.credits = min(self.credits + unused, self.max_credits)
             self.tokens = self.capacity
             self.last_refill_time = current_time
-
     def allow_request(self):
         # with self.lock:  # 🔒 Protect the entire request flow
             self.refill()
-
             if self.tokens > 0:
                 self.tokens -= 1
                 return True
@@ -43,7 +40,6 @@ class RateLimiter:
         self.max_credit_cap = max_credit_cap or max_requests
         self.user_buckets = {}
         # self.registry_lock = threading.Lock()  # 🔐 Lock to protect user bucket creation
-
     def get_bucket(self, user_id):
         if user_id not in self.user_buckets:
             # with self.registry_lock:
