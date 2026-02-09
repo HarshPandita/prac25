@@ -7,8 +7,8 @@ class Context:
 
 class BanRule:
     def __init__(self, field, value, message):
-        self.field = field
-        self.value = value
+        self.field = field #expense_type/vendor_type
+        self.value = value #meal/restaurant
         self.message = message
 
     def evaluate(self, expense, context):
